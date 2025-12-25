@@ -1,5 +1,5 @@
 from typing import List, Tuple
-from ast_leg import VarDecl, BinaryOp, Number, VarRef, Program, Print
+from ast_leg import VarDecl, BinaryOp, Number, VarRef, Program, Print, Stmt, Expr, Node
 from lexer import Token
 
 class Parser:
@@ -17,7 +17,7 @@ class Parser:
         self.pos += 1
         return value
 
-    def parse_statement(self):
+    def parse_statement(self) -> Stmt:
         tok_type, _ = self.peek()
 
         if tok_type == 'VAR':
@@ -35,12 +35,12 @@ class Parser:
         self.consume('SEMI')
         return VarDecl(name, expr)
 
-    def parse_print(self) -> None:
+    def parse_print(self) -> Print:
         self.consume('PRINT')
         name = self.consume('IDENT')
         return Print(name)
 
-    def parse_expr(self):
+    def parse_expr(self) -> Expr:
         left = self.parse_term()
 
         if self.pos < len(self.tokens):
@@ -53,7 +53,7 @@ class Parser:
 
         return left
 
-    def parse_term(self):
+    def parse_term(self) -> Expr:
         tok_type, value = self.peek()
 
         if tok_type == 'NUMBER':
@@ -67,9 +67,8 @@ class Parser:
         else:
             raise SyntaxError("Expected number or identifier")
         
-    def parse_program(self):
+    def parse_program(self) -> Node:
         stmts = []
         while self.pos < len(self.tokens):
             stmts.append(self.parse_statement())
         return Program(stmts)
-
