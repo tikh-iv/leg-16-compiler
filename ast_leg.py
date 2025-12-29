@@ -20,7 +20,7 @@ class VarRef(Expr):
     name: str
 
     def __repr__(self) -> str:
-        return f"Name({self.name})"
+        return f"VarRef({self.name})"
 
 @dataclass
 class BinaryOp(Expr):
