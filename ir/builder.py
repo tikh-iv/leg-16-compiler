@@ -2,6 +2,8 @@ from typing import List
 
 from ast_leg import Expr, Number, VarRef, BinaryOp, Print, VarDecl, Program
 from .instructions import *
+from .values import *
+from .program import ProgrammIRInstruction
 from symbol_table import Symbol, SymbolTable
 
 import logging
@@ -13,6 +15,13 @@ class IRBuilder:
         self.instructions: List[IRInstruction] = []
         self.temp_counter: int = 0
         self.symbol_table: SymbolTable = symbol_table
+        self.slots_map: dict[str, IRSlot] = {}
+
+    def get_slot(self, name: str) -> IRSlot:
+        if name not in self.slots_map:
+            index = self.symbol_table.lookup(name).slot
+            self.slots_map[name] = IRSlot(index=index, name=name)
+        return self.slots_map[name]
 
     def new_temp(self) -> IRTemp:
         logger.debug(f'Creating new temp: t{self.temp_counter}')
@@ -32,9 +41,9 @@ class IRBuilder:
             self.emit(ConstIRInstruction(src=constanta, dst=temp))
             return temp
         elif isinstance(node, VarRef):
-            symbol: Symbol = self.symbol_table.lookup(node.name)
+            slot = self.get_slot(node.name)
             temp: IRTemp = self.new_temp()
-            self.emit(LoadIRInstruction(dst=temp, src=symbol.slot))
+            self.emit(LoadIRInstruction(dst=temp, src=slot))
             return temp
         elif isinstance(node, BinaryOp):
             left_temp = self.build_expr(node.left)
@@ -49,8 +58,8 @@ class IRBuilder:
         logger.debug(f'Building statement for node: {node}')
         if isinstance(node, VarDecl):
             expr_temp: IRTemp = self.build_expr(node.expr)
-            symbol: Symbol = self.symbol_table.lookup(node.name)
-            self.emit(StoreIRInstruction(src=expr_temp, dst=symbol.slot))
+            slot = self.get_slot(node.name)
+            self.emit(StoreIRInstruction(src=expr_temp, dst=slot))
         elif isinstance(node, Print):
             expr_temp: IRTemp = self.build_expr(node.expr)
             self.emit(PrintIRInstruction(value=expr_temp))
@@ -63,7 +72,9 @@ class IRBuilder:
             raise Exception('IRBuilder can only build one program per instance.')
         for stmt in ast_tree.statements:
             self.build_stmt(stmt)
-        return PrintIRInstruction(
+        return ProgrammIRInstruction(
             instructions=self.instructions,
-            slots=self.symbol_table.all_slots()
+            slots=list(self.slots_map.values())
         )
+    
+__all__ = ['IRBuilder']

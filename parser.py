@@ -38,7 +38,7 @@ class Parser:
     def parse_print(self) -> Print:
         self.consume('PRINT')
         name = self.consume('IDENT')
-        return Print(name)
+        return Print(VarRef(name))
 
     def parse_expr(self) -> Expr:
         left = self.parse_term()

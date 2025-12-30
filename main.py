@@ -3,6 +3,7 @@ from lexer import Lexer, Token
 from parser import Parser
 from symbol_table import SemanticAnalyzer, SymbolTable
 from ast_leg import Node, Expr
+from ir.builder import IRBuilder
 
 import logging
 
@@ -33,3 +34,12 @@ print(leg_ast)
 analyzer = SemanticAnalyzer()
 analyzer.visit(leg_ast)
 print(analyzer.table.symbols)
+
+builder = IRBuilder(symbol_table=analyzer.table)
+ir_program = builder.build_program(leg_ast)
+print(ir_program)
+
+
+import pprint
+pprint.pprint(ir_program.instructions) 
+pprint.pprint(ir_program.slots)
