@@ -2,14 +2,14 @@ from enum import IntEnum
 
 
 class Register(IntEnum):
-    R0 = 0b000
-    R1 = 0b001
-    R2 = 0b010
-    R3 = 0b011
-    R4 = 0b100
-    R5 = 0b101
+    R0  = 0b000
+    R1  = 0b001
+    R2  = 0b010
+    R3  = 0b011
+    R4  = 0b100
+    R5  = 0b101
     MAR = 0b110
-    IO = 0b111
+    IO  = 0b111
 
 
 class DecOp(IntEnum):
@@ -61,6 +61,6 @@ class BranchOp(IntEnum):
 
 class MemOp(IntEnum):
     PUSH = 0b0000
-    POP = 0b0001
+    POP  = 0b0001
     STOR = 0b0010
     LOAD = 0b0011
