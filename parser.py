@@ -67,7 +67,7 @@ class Parser:
         else:
             raise SyntaxError("Expected number or identifier")
         
-    def parse_program(self) -> Node:
+    def parse_program(self) -> Program:
         stmts = []
         while self.pos < len(self.tokens):
             stmts.append(self.parse_statement())

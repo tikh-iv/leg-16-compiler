@@ -2,7 +2,7 @@ from typing import List, Tuple
 from lexer import Lexer, Token
 from parser import Parser
 from symbol_table import SemanticAnalyzer, SymbolTable
-from ast_leg import Node, Expr
+from ast_leg import Node, Expr, Program
 from ir.builder import IRBuilder
 
 import logging
@@ -19,6 +19,9 @@ var a = 10;
 var b = 16;
 var c = a % b;
 print c
+var aaa = b;
+var ccc = 777;
+var bbb = aaa % ccc;
 """
 
 lexer = Lexer(code)
@@ -28,7 +31,7 @@ for tok_type, tok_value in tokens:
     print(f'{tok_type:8} | {tok_value}')
 
 leg_parser = Parser(tokens)
-leg_ast: Node = leg_parser.parse_program()
+leg_ast: Program = leg_parser.parse_program()
 print(leg_ast)
 
 analyzer = SemanticAnalyzer()

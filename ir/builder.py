@@ -66,7 +66,7 @@ class IRBuilder:
         else:
             raise NotImplementedError(f"Statement type {type(node)} not implemented")
         
-    def build_program(self, ast_tree: Program) -> PrintIRInstruction:
+    def build_program(self, ast_tree: Program) -> ProgrammIRInstruction:
         logger.debug(f'Building program {ast_tree}')
         if self.instructions:
             raise Exception('IRBuilder can only build one program per instance.')
