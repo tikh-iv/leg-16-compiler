@@ -64,3 +64,7 @@ class MemOp(IntEnum):
     POP  = 0b0001
     STOR = 0b0010
     LOAD = 0b0011
+
+class CallRetOp(IntEnum):
+    CALL = 0b0100
+    RET  = 0b0101
