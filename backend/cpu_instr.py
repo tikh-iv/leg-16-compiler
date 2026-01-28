@@ -22,14 +22,12 @@ class CalcImm:
 class MemLoad:
     op: MemOp
     rd: Register
-    address: int
     dec_op: DecOp = DecOp.MEM_LOAD
 
 @dataclass
 class MemStore:
     op: MemOp
     rs1: Register
-    address: int
     dec_op: DecOp = DecOp.MEM_STOR
 
 @dataclass

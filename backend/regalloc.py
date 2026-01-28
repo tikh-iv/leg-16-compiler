@@ -1,6 +1,6 @@
 from typing import List, Dict
 
-from isa import Register
+from backend.isa import Register
 from ir import IRTemp
 
 import logging
@@ -29,7 +29,7 @@ class RegisterAllocator:
         self.reg_to_temp: Dict[Register, int] = {}
         self.refcount: Dict[int, int] = {}
 
-    def allocate(self, temp_ir: IRTemp):
+    def allocate(self, temp_ir: IRTemp) -> Register:
         logger.debug(f'Allocating register for temp {temp_ir}')
         if not self.is_allocated(temp_ir):
             if self.free_registers:
@@ -71,7 +71,7 @@ class RegisterAllocator:
         else:
             return False
 
-    def get(self, temp_ir: IRTemp):
+    def get_register(self, temp_ir: IRTemp):
         logger.debug(f'Get register for temp {temp_ir}')
         if self.is_allocated(temp_ir):
             logger.info(f'Get register for temp {temp_ir} was allocated.')

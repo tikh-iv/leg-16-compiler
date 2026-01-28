@@ -1,4 +1,7 @@
 from typing import List, Tuple
+
+from backend.lowerer import Lowerer
+from backend.regalloc import RegisterAllocator
 from lexer import Lexer, Token
 from parser import Parser
 from symbol_table import SemanticAnalyzer, SymbolTable
@@ -17,11 +20,7 @@ logging.basicConfig(
 code = """
 var a = 10;
 var b = 16;
-var c = a % b;
-print c
-var aaa = b;
-var ccc = 777;
-var bbb = aaa % ccc;
+var c = a % 4;
 """
 
 lexer = Lexer(code)
@@ -42,7 +41,15 @@ builder = IRBuilder(symbol_table=analyzer.table)
 ir_program = builder.build_program(leg_ast)
 print(ir_program)
 
+reg_alloc = RegisterAllocator()
+
+lowerer = Lowerer(ir_program,reg_alloc)
+lowered_program = lowerer.lower()
 
 import pprint
 pprint.pprint(ir_program.instructions) 
 pprint.pprint(ir_program.slots)
+
+print('-------'*10)
+
+pprint.pprint(lowered_program)
