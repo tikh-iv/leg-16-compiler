@@ -31,9 +31,7 @@ class RegisterAllocator:
 
     def allocate(self, temp_ir: IRTemp):
         logger.debug(f'Allocating register for temp {temp_ir}')
-        if self.is_allocated(temp_ir):
-            raise Exception(f'Cannot allocate, temp is already allocated.')
-        else:
+        if not self.is_allocated(temp_ir):
             if self.free_registers:
                 reg_to_allocate = self.free_registers.pop()
                 self.temp_to_reg[temp_ir.id] = reg_to_allocate
