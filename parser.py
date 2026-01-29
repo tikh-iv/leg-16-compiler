@@ -42,19 +42,37 @@ class Parser:
 
     def parse_expr(self) -> Expr:
         left = self.parse_term()
-
-        if self.pos < len(self.tokens):
+        while self.pos < len(self.tokens):
             tok_type, value = self.peek()
-            if tok_type in ('PLUS', 'MINUS', 'MOD'):
+            if tok_type in (
+                    'PLUS',
+                    'MINUS',
+                    'MOD',
+                    'AND',
+                    'OR',
+                    'XOR',
+                    'SHL',
+                    'SHR',
+                    'ROL',
+                    'ROR',
+                    'MUL',
+                    'DIV',
+            ):
                 op = value
                 self.pos += 1
                 right = self.parse_term()
-                return BinaryOp(left, op, right)
-
+                left = BinaryOp(left, op, right)
+            else:
+                break
         return left
 
     def parse_term(self) -> Expr:
         tok_type, value = self.peek()
+
+        if tok_type == 'NOT':
+            self.pos += 1
+            expr = self.parse_term()
+            return BinaryOp(Number(0), value, expr)
 
         if tok_type == 'NUMBER':
             self.pos += 1
@@ -64,9 +82,12 @@ class Parser:
             self.pos += 1
             return VarRef(value)
 
+        elif tok_type in ('MUL', 'DIV'):
+            raise SyntaxError("Binary operator without left operand")
+
         else:
             raise SyntaxError("Expected number or identifier")
-        
+
     def parse_program(self) -> Program:
         stmts = []
         while self.pos < len(self.tokens):

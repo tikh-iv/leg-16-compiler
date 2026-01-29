@@ -7,17 +7,35 @@ class Lexer:
     token_specification = [
         ('SKIP', r'[ \t\n]+'),  # Skip spaces
         ('COMMENT', r'//.*'),  # Comments
+
         ('SEMI', r';'),
         ('ASSIGN', r'='),
+
+        ('SHL', r'<<'),
+        ('SHR', r'>>'),
+
         ('PLUS', r'\+'),
         ('MINUS', r'-'),
+        ('MUL', r'\*'),
+        ('DIV', r'/'),
         ('MOD', r'%'),
+
+        ('AND', r'&'),
+        ('OR', r'\|'),
+        ('XOR', r'\^'),
+        ('NOT', r'~'),
+
+        ('ROL', r'\brol\b'),
+        ('ROR', r'\bror\b'),
+
         ('PRINT', r'\bprint\b'),
         ('VAR', r'\bvar\b'),
+
         ('NUMBER', r'\d+'),
         ('IDENT', r'[a-zA-Z_]\w*'),
+
         ('MISMATCH', r'.'),  # Mismatch is error
-        ]
+    ]
     # Pattern generator use to create big regexp pattern, like r'(?P<SKIP>[ \\t\\n]+)|(?P<COMMENT>//.*)|(?
     master_pattern = re.compile('|'.join(f'(?P<{name}>{pat})' for name, pat in token_specification))
 
