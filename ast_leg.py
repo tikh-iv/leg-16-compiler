@@ -1,5 +1,7 @@
+from __future__ import annotations
+
 from dataclasses import dataclass
-from typing import List
+from typing import List, Optional
 
 
 class Node: pass
@@ -7,6 +9,10 @@ class Node: pass
 class Expr(Node): pass
 
 class Stmt(Node): pass
+
+@dataclass
+class Block(Stmt):
+    statements: List[Stmt]
 
 @dataclass
 class Number(Expr):
@@ -46,6 +52,14 @@ class Print(Stmt):
     def __repr__(self):
         return f"Print({self.expr})"
 
+@dataclass
+class IfStmt(Stmt):
+    condition: Expr
+    then_block: Block
+    else_block: Block | None
+
+    def __repr__(self):
+        return f"IF(Condition: {self.condition}. Then: {self.then_block}. Else: {self.else_block}.)"
 
 @dataclass
 class Program(Node):

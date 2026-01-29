@@ -1,5 +1,6 @@
 from typing import List, Tuple
-from ast_leg import VarDecl, BinaryOp, Number, VarRef, Program, Print, Stmt, Expr, Node
+from ast_leg import VarDecl, BinaryOp, Number, VarRef, Program, Print, Stmt, Expr, Node, IfStmt, Block
+from ir.builder import logger
 from lexer import Token
 
 class Parser:
@@ -19,13 +20,44 @@ class Parser:
 
     def parse_statement(self) -> Stmt:
         tok_type, _ = self.peek()
+        logger.debug(f'Parsing statement {tok_type}')
 
         if tok_type == 'VAR':
             return self.parse_var_decl()
         elif tok_type == 'PRINT':
             return self.parse_print()
+        elif tok_type == 'IF':
+            return  self.parse_if()
         else:
             raise SyntaxError("Unknown statement")
+
+    def parse_block(self) -> Block:
+        statements = []
+        self.consume('LBRACE')
+        tok_type = ''
+        while tok_type != 'RBRACE':
+            statements.append(self.parse_statement())
+            tok_type, value = self.peek()
+        self.consume('RBRACE')
+        logger.debug(f'Parced block {statements}')
+        return Block(statements=statements)
+
+    def parse_if(self) -> IfStmt:
+        self.consume('IF')
+        condition = self.parse_expr()
+        logger.debug(f'Parced if condition {condition}')
+        self.consume('COLON')
+        block = self.parse_block()
+        logger.debug(f'Parced if block {block}')
+        tok_type, value = self.peek()
+        if tok_type == 'ELSE':
+            self.consume('ELSE')
+            else_block = self.parse_block()
+        else:
+            else_block = Block([])
+        logger.debug(f'Parced else block {block}')
+        return IfStmt(condition, block, else_block)
+
 
     def parse_var_decl(self) -> VarDecl:
         self.consume('VAR')
@@ -45,18 +77,9 @@ class Parser:
         while self.pos < len(self.tokens):
             tok_type, value = self.peek()
             if tok_type in (
-                    'PLUS',
-                    'MINUS',
-                    'MOD',
-                    'AND',
-                    'OR',
-                    'XOR',
-                    'SHL',
-                    'SHR',
-                    'ROL',
-                    'ROR',
-                    'MUL',
-                    'DIV',
+                'PLUS', 'MINUS', 'MOD', 'MUL','DIV',
+                'AND', 'OR', 'XOR', 'SHL', 'SHR', 'ROL', 'ROR',
+                'GT', 'LT', 'GE', 'LE', 'EQ', 'NE'
             ):
                 op = value
                 self.pos += 1
@@ -90,6 +113,7 @@ class Parser:
 
     def parse_program(self) -> Program:
         stmts = []
-        while self.pos < len(self.tokens):
+        while self.peek()[0] != 'EOF':
+            logger.debug(f'Parsing program from token {self.peek()}')
             stmts.append(self.parse_statement())
         return Program(stmts)

@@ -21,10 +21,12 @@ logging.basicConfig(
 code = """
 var a = 10;
 var b = 16;
-var c = a + 4;
-var d = c * b;
-var e = d / b;
-var f = a ^ b;
+if a != b: {
+  var c = a + b;
+}
+else {
+  var c = a - b;
+}
 """
 
 lexer = Lexer(code)

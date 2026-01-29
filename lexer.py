@@ -31,6 +31,22 @@ class Lexer:
         ('PRINT', r'\bprint\b'),
         ('VAR', r'\bvar\b'),
 
+        ('IF', r'\bif\b'),
+        ('ELSE', r'\belse\b'),
+
+        ('LBRACE', r'\{'),
+        ('RBRACE', r'\}'),
+        ('LPAREN', r'\('),
+        ('RPAREN', r'\)'),
+        ('COLON', r':'),
+
+        ('EQ', r'=='),
+        ('NE', r'!='),
+        ('GE', r'>='),
+        ('LE', r'<='),
+        ('GT', r'>'),
+        ('LT', r'<'),
+
         ('NUMBER', r'\d+'),
         ('IDENT', r'[a-zA-Z_]\w*'),
 
@@ -65,4 +81,5 @@ class Lexer:
                 if '\n' in value:
                     line_no += value.count('\n')
                     line_start = mo.end() - value.rfind('\n') - 1
+        lex_tokens.append(('EOF', ''))
         return lex_tokens

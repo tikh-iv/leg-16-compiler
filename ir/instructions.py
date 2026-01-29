@@ -16,7 +16,6 @@ class IRInstruction:
 class ConstIRInstruction(IRInstruction):
     src: IRConst
     dst: IRTemp
-
     def __repr__(self):
         return f"ConstIRInstruction(src={self.src}, dst={self.dst})"
 
@@ -25,7 +24,6 @@ class ConstIRInstruction(IRInstruction):
 class LoadIRInstruction(IRInstruction):
     src: IRSlot
     dst: IRTemp
-
     def __repr__(self):    
         return f"LoadIRInstruction(src={self.src}, dst={self.dst})"
 
@@ -34,7 +32,6 @@ class LoadIRInstruction(IRInstruction):
 class StoreIRInstruction(IRInstruction):
     src: IRValue
     dst: IRSlot
-
     def __repr__(self):
         return f"StoreIRInstruction(src={self.src}, dst={self.dst})"
 
@@ -51,7 +48,6 @@ class BinOpIRInstruction(IRInstruction):
     right: IRTemp | IRConst
     op: str
     dst: IRTemp
-
     def __repr__(self):
         return f"BinOpIRInstruction(left={self.left}, right={self.right}, op='{self.op}', dst={self.dst})"
 
@@ -66,7 +62,6 @@ class BinOpIRInstruction(IRInstruction):
 @dataclass
 class PrintIRInstruction(IRInstruction) :
     value: IRValue
-
     def __repr__(self):
         return f"PrintIRInstruction(value={self.value})"
 
@@ -75,6 +70,26 @@ class PrintIRInstruction(IRInstruction) :
         if isinstance(self.value, IRTemp):
             used.append(self.value)
         return used
-    
+
+@dataclass
+class LabelIRInstruction(IRInstruction):
+    name: str
+    def __repr__(self):
+        return f"LabelIRInstruction(name={self.name})"
+
+@dataclass
+class JumpIRInstruction(IRInstruction):
+    label: str
+    def __repr__(self):
+        return f"JumpIRInstruction(name={self.label})"
+
+@dataclass
+class BranchIRInstruction(IRInstruction):
+    cond_temp: IRTemp
+    label: str
+    op: str
+    def __repr__(self):
+        return f"BranchIRInstruction(cond_temp={self.cond_temp},op={self.op},label={self.label})"
+
 __all__ = ['IRInstruction', 'ConstIRInstruction', 'LoadIRInstruction',
            'StoreIRInstruction', 'BinOpIRInstruction', 'PrintIRInstruction']
