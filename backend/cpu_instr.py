@@ -1,43 +1,37 @@
 from dataclasses import dataclass
+from enum import IntEnum
 
 from backend.isa import ALUOp, MemOp, BranchOp, CallRetOp, DecOp, Register
 
 @dataclass
-class CalcReg:
-    op: ALUOp
-    rs1: Register
-    rs2: Register
-    rd: Register
+class ISAInstruction:
+    op: IntEnum
+    rs1: Register = Register.R0
+    rs2: Register = Register.R0
+    rd: Register = Register.R0
+    imm: int = 0
     dec_op: DecOp = DecOp.CALC_REG
 
 @dataclass
-class CalcImm:
-    op: ALUOp
-    rs1: Register
-    imm: int
-    rd: Register
+class CalcReg(ISAInstruction):
+    dec_op: DecOp = DecOp.CALC_REG
+
+@dataclass
+class CalcImm(ISAInstruction):
     dec_op: DecOp = DecOp.CALC_IMM
 
 @dataclass
-class MemLoad:
-    op: MemOp
-    rd: Register
+class MemLoad(ISAInstruction):
     dec_op: DecOp = DecOp.MEM_LOAD
 
 @dataclass
-class MemStore:
-    op: MemOp
-    rs1: Register
+class MemStore(ISAInstruction):
     dec_op: DecOp = DecOp.MEM_STOR
 
 @dataclass
-class CallRet:
-    op: CallRetOp
-    address: int
+class CallRet(ISAInstruction):
     dec_op: DecOp = DecOp.CALL_RET
 
 @dataclass
-class Branch:
-    op: BranchOp
-    address: int
+class Branch(ISAInstruction):
     dec_op: DecOp = DecOp.BRANCH

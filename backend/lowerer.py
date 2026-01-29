@@ -76,7 +76,6 @@ class Lowerer:
         self.cpu_instructions.append(
             CalcImm(
                 op=ALUOp.MOV,
-                rs1=Register.R0,  # заглушка
                 rd=Register.MAR,
                 imm=store_ir.dst.index
             )

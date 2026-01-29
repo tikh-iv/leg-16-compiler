@@ -1,5 +1,6 @@
 from typing import List, Tuple
 
+from backend.encoder import Encoder
 from backend.lowerer import Lowerer
 from backend.regalloc import RegisterAllocator
 from lexer import Lexer, Token
@@ -53,3 +54,16 @@ pprint.pprint(ir_program.slots)
 print('-------'*10)
 
 pprint.pprint(lowered_program)
+
+print('-------'*10)
+encoder = Encoder()
+code = encoder.encode_program(lowered_program=lowered_program)
+
+
+for word in code:
+    print(f'{word[0]} {word[1]}')
+
+
+for word in code:
+    s = f'{word[0]:016b}'
+    print(f'{s[:3]} {s[3:7]} {s[7:10]} {s[10:13]} {s[13:]} {word[1]}')
