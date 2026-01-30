@@ -171,9 +171,9 @@ python main.py
 Edit `main.py` to include your source code:
 
 ```python
-from lexer import Lexer
-from parser import Parser
-from symbol_table import SemanticAnalyzer
+from frontend.lexer import Lexer
+from frontend.parser import Parser
+from frontend.symbol_table import SemanticAnalyzer
 from ir.builder import IRBuilder
 
 # Your source code

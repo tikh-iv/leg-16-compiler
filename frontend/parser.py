@@ -1,7 +1,7 @@
-from typing import List, Tuple
-from ast_leg import VarDecl, BinaryOp, Number, VarRef, Program, Print, Stmt, Expr, Node, IfStmt, Block
+from typing import List
+from frontend.ast_leg import VarDecl, BinaryOp, Number, VarRef, Program, Print, Stmt, Expr, IfStmt, Block
 from ir.builder import logger
-from lexer import Token
+from frontend.lexer import Token
 
 class Parser:
     def __init__(self, tokens: List[Token]) -> None:

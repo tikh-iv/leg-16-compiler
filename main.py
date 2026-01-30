@@ -1,12 +1,12 @@
-from typing import List, Tuple
+from typing import List
 
 from backend.encoder import Encoder
 from backend.lowerer import Lowerer
 from backend.regalloc import RegisterAllocator
-from lexer import Lexer, Token
-from parser import Parser
-from symbol_table import SemanticAnalyzer, SymbolTable
-from ast_leg import Node, Expr, Program
+from frontend.lexer import Lexer, Token
+from frontend.parser import Parser
+from frontend.symbol_table import SemanticAnalyzer
+from frontend.ast_leg import Program
 from ir.builder import IRBuilder
 
 import logging

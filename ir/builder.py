@@ -1,10 +1,10 @@
 from typing import List
 
-from ast_leg import Expr, Number, VarRef, BinaryOp, Print, VarDecl, Program
+from frontend.ast_leg import Expr, Number, VarRef, BinaryOp, Print, VarDecl, Program
 from .instructions import *
 from .values import *
 from .program import ProgrammIRInstruction
-from symbol_table import Symbol, SymbolTable
+from frontend.symbol_table import SymbolTable
 
 import logging
 logger = logging.getLogger('Builder')

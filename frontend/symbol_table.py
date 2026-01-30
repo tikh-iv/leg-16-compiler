@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 import logging
-from ast_leg import VarDecl, BinaryOp, Number, VarRef, Program, Print, Stmt, Expr, Node
+from frontend.ast_leg import VarDecl, BinaryOp, Number, VarRef, Program, Print, Node
 
 logger = logging.getLogger('semantic')
 
