@@ -54,12 +54,12 @@ class Print(Stmt):
 
 @dataclass
 class IfStmt(Stmt):
-    condition: Expr
+    condition: BinaryOp
     then_block: Block
     else_block: Block | None
 
     def __repr__(self):
-        return f"IF(Condition: {self.condition}. Then: {self.then_block}. Else: {self.else_block}.)"
+        return f"IfStmt(Condition: {self.condition}. Then: {self.then_block}. Else: {self.else_block}.)"
 
 @dataclass
 class Program(Node):

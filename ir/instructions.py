@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import List
 from .values import *
+from .values import IRLabel
 
 
 @dataclass
@@ -71,13 +72,13 @@ class PrintIRInstruction(IRInstruction) :
 
 @dataclass
 class LabelIRInstruction(IRInstruction):
-    name: str
+    name: IRLabel
     def __repr__(self):
         return f"LabelIRInstruction(name={self.name})"
 
 @dataclass
 class JumpIRInstruction(IRInstruction):
-    label: str
+    label: IRLabel
     def __repr__(self):
         return f"JumpIRInstruction(name={self.label})"
 
@@ -85,7 +86,7 @@ class JumpIRInstruction(IRInstruction):
 class BranchIRInstruction(IRInstruction):
     left: IRTemp
     right: IRTemp
-    label: str
+    label: IRLabel
     op: str
     def __repr__(self):
         return f"BranchIRInstruction(left={self.left},op={self.op},right={self.right},label={self.label})"

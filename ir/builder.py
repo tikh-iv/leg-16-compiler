@@ -1,12 +1,16 @@
 from typing import List
 
-from frontend.ast_leg import Expr, Number, VarRef, BinaryOp, Print, VarDecl, Program
+from frontend.ast_leg import Expr, Number, VarRef, BinaryOp, Print, VarDecl, Program, IfStmt
 from .instructions import *
+from .instructions import BranchIRInstruction, JumpIRInstruction, LabelIRInstruction
 from .values import *
 from .program import ProgrammIRInstruction
 from frontend.symbol_table import SymbolTable
 
 import logging
+
+from .values import IRLabel
+
 logger = logging.getLogger('Builder')
 
 
@@ -14,6 +18,7 @@ class IRBuilder:
     def __init__(self, symbol_table: SymbolTable):
         self.instructions: List[IRInstruction] = []
         self.temp_counter: int = 0
+        self.label_counter: int = 0
         self.symbol_table: SymbolTable = symbol_table
         self.slots_map: dict[str, IRSlot] = {}
 
@@ -28,6 +33,12 @@ class IRBuilder:
         temp = IRTemp(self.temp_counter)
         self.temp_counter += 1
         return temp
+
+    def new_label(self) -> IRLabel:
+        logger.debug(f'Creating new label: l{self.temp_counter}')
+        label = IRLabel(self.temp_counter)
+        self.label_counter += 1
+        return label
     
     def emit(self, instruction: IRInstruction) -> None:
         logger.debug(f'Emitting instruction: {instruction}')
@@ -53,13 +64,35 @@ class IRBuilder:
             return result_temp
         else:
             raise NotImplementedError(f"Expression type {type(node)} not implemented")
-        
+
+    def build_if_stmt(self, node:IfStmt):
+        else_label = self.new_label()
+        end_label = self.new_label()
+        self.emit(
+            BranchIRInstruction(
+                left=self.build_expr(node.condition.left),
+                right=self.build_expr(node.condition.right),
+                op=node.condition.op,
+                label=else_label
+            )
+        )
+        for stmt in node.then_block.statements:
+            self.build_stmt(stmt)
+        self.emit(JumpIRInstruction(end_label))
+        self.emit(LabelIRInstruction(else_label))
+        if node.else_block.statements:
+            for stmt in node.else_block.statements:
+                self.build_stmt(stmt)
+        self.emit(LabelIRInstruction(end_label))
+
     def build_stmt(self, node) -> None:
         logger.debug(f'Building statement for node: {node}')
         if isinstance(node, VarDecl):
             expr_temp: IRTemp = self.build_expr(node.expr)
             slot = self.get_slot(node.name)
             self.emit(StoreIRInstruction(src=expr_temp, dst=slot))
+        elif isinstance(node, IfStmt):
+            self.build_if_stmt(node)
         elif isinstance(node, Print):
             expr_temp: IRTemp = self.build_expr(node.expr)
             self.emit(PrintIRInstruction(value=expr_temp))

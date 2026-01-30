@@ -26,9 +26,15 @@ class IRConst(IRValue):
 class IRSlot(IRValue):
     index: int
     name: str
-
     def __repr__(self):
         return f"IRSlot(index={self.index}, name='{self.name}')"
+
+
+@dataclass
+class IRLabel(IRValue):
+    index: int
+    def __repr__(self):
+        return f"IRLabel(index={self.index}')"
 
 
 __all__ = ['IRValue', 'IRTemp', 'IRConst', 'IRSlot']
