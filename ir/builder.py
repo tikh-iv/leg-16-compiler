@@ -13,6 +13,16 @@ from .values import IRLabel
 
 logger = logging.getLogger('Builder')
 
+def invert_op_command(op) -> str:
+    op_inversion = {
+        '==': '!=',
+        '!=': '==',
+        '>=': '<',
+        '<=': '>',
+        '<': '>=',
+        '>': '<='
+    }
+    return op_inversion[op]
 
 class IRBuilder:
     def __init__(self, symbol_table: SymbolTable):
@@ -72,7 +82,7 @@ class IRBuilder:
             BranchIRInstruction(
                 left=self.build_expr(node.condition.left),
                 right=self.build_expr(node.condition.right),
-                op=node.condition.op,
+                op=invert_op_command(node.condition.op),
                 label=else_label
             )
         )

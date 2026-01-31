@@ -31,20 +31,23 @@ else {
 
 lexer = Lexer(code)
 tokens: List[Token] = lexer.tokenize()
-
+print('tokens'+'-'*10)
 for tok_type, tok_value in tokens:
     print(f'{tok_type:8} | {tok_value}')
 
 leg_parser = Parser(tokens)
 leg_ast: Program = leg_parser.parse_program()
+print('leg_ast'+'-'*10)
 print(leg_ast)
 
 analyzer = SemanticAnalyzer()
 analyzer.visit(leg_ast)
+print('symbol_table'+'-'*10)
 print(analyzer.table.symbols)
 
 builder = IRBuilder(symbol_table=analyzer.table)
 ir_program = builder.build_program(leg_ast)
+print('ir_program'+'-'*10)
 print(ir_program)
 
 reg_alloc = RegisterAllocator()
