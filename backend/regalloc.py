@@ -4,7 +4,7 @@ from backend.isa import Register
 from ir import IRTemp
 
 import logging
-logger = logging.getLogger('Allocator')
+logger = logging.getLogger('Register Allocator')
 
 
 class RegisterAllocator:

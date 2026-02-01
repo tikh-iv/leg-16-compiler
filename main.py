@@ -19,14 +19,15 @@ logging.basicConfig(
 
 
 code = """
-var a = 10;
-var b = 16;
+var a = 13;
+var b = 10;
 if a != b: {
   var c = a + b;
 }
 else {
-  var c = a - b;
+  var c = a * b;
 }
+var d = c % 11;
 """
 
 lexer = Lexer(code)
@@ -50,9 +51,7 @@ ir_program = builder.build_program(leg_ast)
 print('ir_program'+'-'*10)
 print(ir_program)
 
-reg_alloc = RegisterAllocator()
-
-lowerer = Lowerer(ir_program,reg_alloc)
+lowerer = Lowerer(ir_program)
 lowered_program = lowerer.lower()
 
 import pprint

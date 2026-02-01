@@ -1,22 +1,26 @@
 from os import cpu_count
 from typing import Dict, List
 
-from backend.cpu_instr import CalcImm, CalcReg, MemLoad, MemStore
-from backend.isa import Register, ALUOp, MemOp
+from backend.cpu_instr import ISACalcImm, ISACalcReg, ISAMemLoad, ISAMemStore, ISABranch
+from backend.isa import Register, ALUOp, MemOp, BranchOp
+from backend.labelalloc import LabelAllocator
 from backend.regalloc import RegisterAllocator
 from backend.temp_usage_analyzer import TempUsageAnalyzer
 from ir import ProgrammIRInstruction, ConstIRInstruction, LoadIRInstruction, StoreIRInstruction, BinOpIRInstruction, PrintIRInstruction, IRTemp, IRConst
 
 import logging
+
+from ir.instructions import BranchIRInstruction, JumpIRInstruction, LabelIRInstruction
+
 logger = logging.getLogger('Lowering')
 
 
 class Lowerer:
     def __init__(self,
-                 program: ProgrammIRInstruction,
-                 register_allocator: RegisterAllocator):
+                 program: ProgrammIRInstruction):
         self.program = program
-        self.register_allocator = register_allocator
+        self.register_allocator = RegisterAllocator()
+        self.label_allocator = LabelAllocator()
         self.refcount = {}
         self.cpu_instructions: List = []
         self.temp_usage_analyzer = TempUsageAnalyzer(self.program)
@@ -30,25 +34,67 @@ class Lowerer:
             self.visit_instruction(instr)
             for temp in instr.used_temps():
                 self.register_allocator.consume(temp)
+        self.patch_offset()
         return self.cpu_instructions
+
+    def patch_offset(self):
+        logger.debug(f'Patching offset')
+        logger.info(f'Label table: {self.label_allocator.labels}')
+        for isa_instruction in self.cpu_instructions:
+            if isinstance(isa_instruction, ISABranch):
+                isa_instruction.imm = self.label_allocator.labels[isa_instruction.imm]
 
     def visit_instruction(self, instr):
         if isinstance(instr, ConstIRInstruction):
-            cpu_instr = self.visit_const(instr)
+            self.visit_const(instr)
         elif isinstance(instr, LoadIRInstruction):
-            cpu_instr = self.visit_load(instr)
+            self.visit_load(instr)
         elif isinstance(instr, StoreIRInstruction):
-            cpu_instr = self.visit_store(instr)
+            self.visit_store(instr)
         elif isinstance(instr, BinOpIRInstruction):
-            cpu_instr = self.visit_binop(instr)
-        elif isinstance(instr, PrintIRInstruction):
-            cpu_count = None
+            self.visit_binop(instr)
+        elif isinstance(instr, BranchIRInstruction):
+            self.visit_branch(instr)
+        elif isinstance(instr, JumpIRInstruction):
+            self.visit_jump(instr)
+        elif isinstance(instr, LabelIRInstruction):
+            self.visit_label(instr)
+        else:
+            raise Exception(f'Cant visit {instr}. Not implimented')
+
+    def visit_label(self, label: LabelIRInstruction):
+        self.label_allocator.labels[label.label.index] = len(self.cpu_instructions)*2
+
+    def visit_branch(self, branch: BranchIRInstruction):
+        left_reg = self.register_allocator.get_register(branch.left)
+        right_reg = self.register_allocator.get_register(branch.right)
+        op_map = {
+        '==': BranchOp.BEQ,
+        '!=': BranchOp.BNE,
+        '>=': BranchOp.BGE,
+        '<=': BranchOp.BLE,
+        '<':  BranchOp.BGT,
+        '>':  BranchOp.BLT
+    }
+        cpu_instr = ISABranch(
+            rs1=left_reg,
+            rs2=right_reg,
+            op=op_map[branch.op],
+            imm=branch.label.index
+        )
+        self.cpu_instructions.append(cpu_instr)
+
+    def visit_jump(self, jump_ir: JumpIRInstruction):
+        cpu_instr = ISABranch(
+            op=BranchOp.JUMP,
+            imm=jump_ir.label.index
+        )
+        self.cpu_instructions.append(cpu_instr)
 
     def visit_const(self, const_ir: ConstIRInstruction):
         reg: Register = self.register_allocator.allocate(const_ir.dst)
-        cpu_instr = CalcImm(
+        cpu_instr = ISACalcImm(
             op=ALUOp.MOV,
-            rs1=Register.R0, # заглушка
             rd=reg,
             imm=const_ir.src.value
         )
@@ -57,15 +103,14 @@ class Lowerer:
     def visit_load(self, load_ir: LoadIRInstruction):
         reg: Register = self.register_allocator.allocate(load_ir.dst)
         self.cpu_instructions.append(
-            CalcImm(
+            ISACalcImm(
                 op=ALUOp.MOV,
-                rs1=Register.R0,  # заглушка
                 rd=Register.MAR,
                 imm=load_ir.src.index
             )
         )
         self.cpu_instructions.append(
-            MemLoad(
+            ISAMemLoad(
                 op=MemOp.LOAD,
                 rd=reg
             )
@@ -74,14 +119,14 @@ class Lowerer:
     def visit_store(self, store_ir: StoreIRInstruction):
         src_reg: Register = self.register_allocator.get_register(store_ir.src)
         self.cpu_instructions.append(
-            CalcImm(
+            ISACalcImm(
                 op=ALUOp.MOV,
                 rd=Register.MAR,
                 imm=store_ir.dst.index
             )
         )
         self.cpu_instructions.append(
-            MemStore(
+            ISAMemStore(
                 op=MemOp.STOR,
                 rs1=src_reg
             )
@@ -111,7 +156,7 @@ class Lowerer:
 
         if isinstance(binop_ir.right, IRConst):
             self.cpu_instructions.append(
-                CalcImm(
+                ISACalcImm(
                     op=alu_op,
                     rs1=left_reg,
                     rd=dst_reg,
@@ -121,7 +166,7 @@ class Lowerer:
         elif isinstance(binop_ir.right, IRTemp):
             right_reg = self.register_allocator.get_register(binop_ir.right)
             self.cpu_instructions.append(
-                CalcReg(
+                ISACalcReg(
                     op=alu_op,
                     rs1=left_reg,
                     rs2=right_reg,

@@ -34,7 +34,7 @@ class IRSlot(IRValue):
 class IRLabel(IRValue):
     index: int
     def __repr__(self):
-        return f"IRLabel(index={self.index}')"
+        return f"IRLabel(index={self.index})"
 
 
 __all__ = ['IRValue', 'IRTemp', 'IRConst', 'IRSlot']

@@ -72,9 +72,9 @@ class PrintIRInstruction(IRInstruction) :
 
 @dataclass
 class LabelIRInstruction(IRInstruction):
-    name: IRLabel
+    label: IRLabel
     def __repr__(self):
-        return f"LabelIRInstruction(name={self.name})"
+        return f"LabelIRInstruction(name={self.label})"
 
 @dataclass
 class JumpIRInstruction(IRInstruction):
@@ -89,7 +89,7 @@ class BranchIRInstruction(IRInstruction):
     label: IRLabel
     op: str
     def __repr__(self):
-        return f"BranchIRInstruction(left={self.left},op={self.op},right={self.right},label={self.label})"
+        return f"BranchIRInstruction(left={self.left},op='{self.op}',right={self.right},label={self.label})"
     def used_temps(self) -> List[IRTemp]:
         used = []
         if isinstance(self.left, IRTemp):

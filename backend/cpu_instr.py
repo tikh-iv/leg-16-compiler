@@ -13,25 +13,25 @@ class ISAInstruction:
     dec_op: DecOp = DecOp.CALC_REG
 
 @dataclass
-class CalcReg(ISAInstruction):
+class ISACalcReg(ISAInstruction):
     dec_op: DecOp = DecOp.CALC_REG
 
 @dataclass
-class CalcImm(ISAInstruction):
+class ISACalcImm(ISAInstruction):
     dec_op: DecOp = DecOp.CALC_IMM
 
 @dataclass
-class MemLoad(ISAInstruction):
+class ISAMemLoad(ISAInstruction):
     dec_op: DecOp = DecOp.MEM_LOAD
 
 @dataclass
-class MemStore(ISAInstruction):
+class ISAMemStore(ISAInstruction):
     dec_op: DecOp = DecOp.MEM_STOR
 
 @dataclass
-class CallRet(ISAInstruction):
+class ISACallRet(ISAInstruction):
     dec_op: DecOp = DecOp.CALL_RET
 
 @dataclass
-class Branch(ISAInstruction):
+class ISABranch(ISAInstruction):
     dec_op: DecOp = DecOp.BRANCH
