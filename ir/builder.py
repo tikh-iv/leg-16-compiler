@@ -46,7 +46,7 @@ class IRBuilder:
         return temp
 
     def new_label(self) -> IRLabel:
-        logger.debug(f'Creating new label: l{self.temp_counter}')
+        logger.debug(f'Creating new label: l{self.label_counter}')
         label = IRLabel(self.label_counter)
         self.label_counter += 1
         return label

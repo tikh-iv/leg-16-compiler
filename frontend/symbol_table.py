@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 import logging
-from frontend.ast_leg import VarDecl, BinaryOp, Number, VarRef, Program, Print, Node, IfStmt, Block
+from frontend.ast_leg import VarDecl, BinaryOp, Number, VarRef, Program, Print, Node, IfStmt, Block, WhileStmt
 
 logger = logging.getLogger('semantic')
 
@@ -25,7 +25,7 @@ class SymbolTable:
 
     def lookup(self, name) -> Symbol:
         if name not in self.symbols:
-            raise Exception(f"{name} not declared")
+            raise Exception(f"{name} not declared in {self.symbols}")
         return self.symbols[name]
     
     def all_slots(self) -> list[int]:
@@ -44,7 +44,8 @@ class SemanticAnalyzer:
                 self.visit(s)
 
         elif isinstance(node, VarDecl):
-            sym = self.table.declare(node.name)
+            self.table.declare(node.name)
+            logger.debug(f"{node.name} declared")
             self.visit(node.expr)
 
         elif isinstance(node, BinaryOp):
@@ -58,6 +59,10 @@ class SemanticAnalyzer:
             self.visit(node.condition)
             self.visit(node.then_block)
             self.visit(node.else_block)
+
+        elif isinstance(node, WhileStmt):
+            self.visit(node.condition)
+            self.visit(node.body_block)
 
         elif isinstance(node, Block):
             for block_node in node.statements:

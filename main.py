@@ -1,3 +1,4 @@
+import time
 from typing import List
 
 from backend.encoder import Encoder
@@ -19,12 +20,14 @@ logging.basicConfig(
 
 
 code = """
-var a = 2;
-var b = 10;
-while a < b:{
-  var a = a + 1;
+var n = 6;
+var result = 1;
+
+while n > 1:{
+    var result = result * n;
+    var n = n - 1;
 }
-var c = a;
+var aaaa = 0;
 """
 
 lexer = Lexer(code)
@@ -63,11 +66,13 @@ print('-------'*10)
 encoder = Encoder()
 code = encoder.encode_program(lowered_program=lowered_program)
 
+time.sleep(1)
+
+for word in code:
+    s = f'{word[0]:016b}'
+    print(f'{s[:3]} {s[3:7]} {s[7:10]} {s[10:13]} {s[13:]} {word[1]}')
 
 for word in code:
     print(f'{word[0]} {word[1]}')
 
 
-for word in code:
-    s = f'{word[0]:016b}'
-    print(f'{s[:3]} {s[3:7]} {s[7:10]} {s[10:13]} {s[13:]} {word[1]}')

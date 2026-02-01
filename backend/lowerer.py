@@ -73,8 +73,8 @@ class Lowerer:
         '!=': BranchOp.BNE,
         '>=': BranchOp.BGE,
         '<=': BranchOp.BLE,
-        '<':  BranchOp.BGT,
-        '>':  BranchOp.BLT
+        '>':  BranchOp.BGT,
+        '<':  BranchOp.BLT
     }
         cpu_instr = ISABranch(
             rs1=left_reg,
