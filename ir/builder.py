@@ -36,6 +36,7 @@ class IRBuilder:
         if name not in self.slots_map:
             index = self.symbol_table.lookup(name).slot
             self.slots_map[name] = IRSlot(index=index, name=name)
+            logger.debug(f'Slotting IRSlot {name} {index}')
         return self.slots_map[name]
 
     def new_temp(self) -> IRTemp:

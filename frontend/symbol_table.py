@@ -15,11 +15,12 @@ class SymbolTable:
         self.next_slot = 0
 
     def declare(self, name) -> Symbol:
-        if name in self.symbols:
-            logger.debug(f"{name} already declared")
         sym = Symbol(name=name, slot=self.next_slot)
-        self.symbols[name] = sym
-        self.next_slot += 1
+        if name in self.symbols:
+            logger.debug(f"{name} already declared {self.symbols}")
+        else:
+            self.symbols[name] = sym
+            self.next_slot += 1
         return sym
 
     def lookup(self, name) -> Symbol:
