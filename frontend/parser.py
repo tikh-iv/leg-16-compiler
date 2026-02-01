@@ -1,5 +1,7 @@
+from __future__ import annotations
+
 from typing import List
-from frontend.ast_leg import VarDecl, BinaryOp, Number, VarRef, Program, Print, Stmt, Expr, IfStmt, Block
+from frontend.ast_leg import VarDecl, BinaryOp, Number, VarRef, Program, Print, Stmt, Expr, IfStmt, Block, WhileStmt
 from ir.builder import logger
 from frontend.lexer import Token
 
@@ -28,6 +30,8 @@ class Parser:
             return self.parse_print()
         elif tok_type == 'IF':
             return  self.parse_if()
+        elif tok_type == 'WHILE':
+            return self.parse_while()
         else:
             raise SyntaxError("Unknown statement")
 
@@ -58,6 +62,14 @@ class Parser:
         logger.debug(f'Parced else block {block}')
         return IfStmt(condition, block, else_block)
 
+    def parse_while(self) -> WhileStmt:
+        self.consume('WHILE')
+        condition = self.parse_expr()
+        logger.debug(f'Parced While condition {condition}')
+        self.consume('COLON')
+        block = self.parse_block()
+        logger.debug(f'Parced While block {block}')
+        return WhileStmt(condition, block)
 
     def parse_var_decl(self) -> VarDecl:
         self.consume('VAR')
@@ -72,7 +84,7 @@ class Parser:
         name = self.consume('IDENT')
         return Print(VarRef(name))
 
-    def parse_expr(self) -> Expr:
+    def parse_expr(self) -> Expr | BinaryOp:
         left = self.parse_term()
         while self.pos < len(self.tokens):
             tok_type, value = self.peek()

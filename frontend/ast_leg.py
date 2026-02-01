@@ -62,6 +62,11 @@ class IfStmt(Stmt):
         return f"IfStmt(Condition: {self.condition}. Then: {self.then_block}. Else: {self.else_block}.)"
 
 @dataclass
+class WhileStmt(Stmt):
+    condition: BinaryOp
+    body_block: Block
+
+@dataclass
 class Program(Node):
     statements: List[Stmt]
 

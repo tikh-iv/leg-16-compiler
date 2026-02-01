@@ -32,7 +32,6 @@ class SymbolTable:
         return [sym.slot for sym in self.symbols.values()]
 
 
-
 class SemanticAnalyzer:
     def __init__(self):
         self.table = SymbolTable()

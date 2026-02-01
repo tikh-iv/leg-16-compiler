@@ -1,6 +1,6 @@
 from typing import List
 
-from frontend.ast_leg import Expr, Number, VarRef, BinaryOp, Print, VarDecl, Program, IfStmt
+from frontend.ast_leg import Expr, Number, VarRef, BinaryOp, Print, VarDecl, Program, IfStmt, WhileStmt
 from .instructions import *
 from .instructions import BranchIRInstruction, JumpIRInstruction, LabelIRInstruction
 from .values import *
@@ -76,6 +76,23 @@ class IRBuilder:
         else:
             raise NotImplementedError(f"Expression type {type(node)} not implemented")
 
+    def build_while_stmt(self, node:WhileStmt):
+        start_label = self.new_label()
+        stop_label = self.new_label()
+        self.emit(LabelIRInstruction(start_label))
+        self.emit(
+            BranchIRInstruction(
+                left=self.build_expr(node.condition.left),
+                right=self.build_expr(node.condition.right),
+                op=invert_op_command(node.condition.op),
+                label=stop_label
+            )
+        )
+        for stmt in node.body_block.statements:
+            self.build_stmt(stmt)
+        self.emit(JumpIRInstruction(start_label))
+        self.emit(LabelIRInstruction(stop_label))
+
     def build_if_stmt(self, node:IfStmt):
         else_label = self.new_label()
         end_label = self.new_label()
@@ -104,6 +121,8 @@ class IRBuilder:
             self.emit(StoreIRInstruction(src=expr_temp, dst=slot))
         elif isinstance(node, IfStmt):
             self.build_if_stmt(node)
+        elif isinstance(node, WhileStmt):
+            self.build_while_stmt(node)
         elif isinstance(node, Print):
             expr_temp: IRTemp = self.build_expr(node.expr)
             self.emit(PrintIRInstruction(value=expr_temp))

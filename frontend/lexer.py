@@ -34,6 +34,8 @@ class Lexer:
         ('IF', r'\bif\b'),
         ('ELSE', r'\belse\b'),
 
+        ('WHILE', r'\bwhile\b'),
+
         ('LBRACE', r'\{'),
         ('RBRACE', r'\}'),
         ('LPAREN', r'\('),
